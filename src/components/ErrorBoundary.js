@@ -5,8 +5,6 @@ export default class ErrorBoundary extends Component {
     super(props);
     this.state = {
       hasError: false,
-      error: '',
-      errorInfo: ''
     };
   }
   //if anything errors out, this lifecycle hook gets ran
