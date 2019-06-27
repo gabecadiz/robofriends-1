@@ -6,44 +6,38 @@ import Scroll from '../components/Scroll';
 import ErrorBoundary from '../components/ErrorBoundary';
 import './App.css';
 
-import { setSearchField } from '../actions'
+import { setSearchField, requestRobots } from '../actions'
 //tell me what piece of state i need to listen to and send it down as props
 const mapStateToProps = state => {
   return {
-    searchField: state.searchField
+    searchField: state.searchRobots.searchField,
+    robots: state.requestRobots.robots,
+    isPending: state.requestRobots.isPending,
+    error: state.requestRobots.error
   }
 }
 //dispatch is what sends action to reducer
 //tell me what props that are actions that i need to listen to that are actions that need to get dispatched
 const mapDispatchToProps = (dispatch) => {
   return {
-    onSearchChange: (event) => dispatch(setSearchField(event.target.value))
+    onSearchChange: (event) => dispatch(setSearchField(event.target.value)),
+    //request robots action, requestRobots action needs a dispatch method to actually dispatch these actions. 
+    onRequestRobots: () => dispatch(requestRobots())
   }
 }
 
 class App extends Component {
-  constructor() {
-    super();
-    this.state = {
-      robots: []
-    };
-  }
 
   componentDidMount() {
-    fetch('https://jsonplaceholder.typicode.com/users')
-      .then(response => response.json())
-      .then(users => {
-        this.setState({ robots: users });
-      });
+    this.props.onRequestRobots()
   }
 
   render() {
-    const { robots } = this.state;
-    const { searchField, onSearchChange } = this.props
+    const { searchField, onSearchChange, robots, isPending } = this.props
     const filteredRobots = robots.filter(robot => {
       return robot.name.toLowerCase().includes(searchField.toLowerCase());
     });
-    return !robots.length ? (
+    return isPending ? (
       <h1>Loading</h1>
     ) : (
         <div className='tc'>
